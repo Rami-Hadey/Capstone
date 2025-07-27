@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background: linear-gradient(180deg, #4FE6FA 0%, #412BA2 100%);
+            background-attachment: fixed;  /* This ensures the gradient covers the full page */
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .controls input, .controls select, .controls button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        .anonymous-row {
+            background-color: #f0f0f0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Admin Dashboard - User Participation Points</h2>
+
+        <div class="controls">
+            <label for="filterInput">Filter by Name:</label>
+            <input type="text" id="filterInput" placeholder="Enter name...">
+            
+            <label for="sortOptions">Sort By:</label>
+            <select id="sortOptions">
+                <option value="user_id">User ID</option>
+                <option value="name">Name</option>
+                <option value="points">Participation Points</option>
+            </select>
+
+            <button onclick="exportCSV()">Export CSV</button>
+            <button onclick="window.location.href='adminlanding.html'">Back Home</button>
+        </div>
+
+        <table id="userTable">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Participation Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let userData = [];
+
+        // Fetch user data from the server
+        async function fetchUserData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/user-points');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user data');
+                }
+                userData = await response.json();
+                loadUserData(userData);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to load user data');
+            }
+        }
+
+        // Load user data
+        function loadUserData(filteredData = userData) {
+            const tableBody = document.querySelector("#userTable tbody");
+            tableBody.innerHTML = ""; // Clear table
+
+            filteredData.forEach(user => {
+                const row = document.createElement("tr");
+                // Add special styling for anonymous responses
+                if (user.name === 'Anonymous') {
+                    row.classList.add('anonymous-row');
+                }
+                row.innerHTML = `
+                    <td>${user.user_id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.points || 0}</td>`;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Sorting logic
+        document.getElementById("sortOptions").addEventListener("change", function() {
+            const sortBy = this.value;
+            const sortedData = [...userData].sort((a, b) => {
+                if (sortBy === "name") {
+                    // Put Anonymous entries at the bottom when sorting by name
+                    if (a.name === 'Anonymous') return 1;
+                    if (b.name === 'Anonymous') return -1;
+                    return a.name.localeCompare(b.name);
+                }
+                return b[sortBy] - a[sortBy]; // Sort in descending order
+            });
+            loadUserData(sortedData);
+        });
+
+        // Filtering logic
+        document.getElementById("filterInput").addEventListener("input", function() {
+            const searchText = this.value.toLowerCase();
+            const filteredData = userData.filter(user => 
+                user.name.toLowerCase().includes(searchText)
+            );
+            loadUserData(filteredData);
+        });
+
+        // Export to CSV
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,User ID,Name,Participation Points\n";
+            userData.forEach(user => {
+                csvContent += `${user.user_id},${user.name},${user.points || 0}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "participation_data.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+
+        // Initialize the page
+        document.addEventListener("DOMContentLoaded", fetchUserData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Survey Results</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+        
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, #4FE6FA 0%, #412BA2 100%);
+        }
+
+        .container {
+            width: 60%;  
+            max-width: 1000px;
+            margin: 20px auto;  
+            padding: 20px;
+            font-family: 'Fugaz One';
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(217, 217, 217, 0.32);
+            border-radius: 35px;
+        }
+
+        .survey-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
+        }
+
+        .survey-header {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .survey-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .stat-box {
+            padding: 10px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Fugaz One';
+        }
+
+        .btn-primary {
+            background: white;
+            color: black;
+        }
+
+        .btn-secondary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            background: #D4D2D2;
+        }
+
+        .no-surveys {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        .last-response {
+            font-style: italic;
+            color: #666;
+        }
+
+        .error-message {
+            color: #ff4444;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="survey-header">
+            <h2>Survey Results Dashboard</h2>
+        </div>
+
+        <div id="surveyList">
+            <!-- Surveys will be listed here -->
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadAllSurveyResults() {
+            const surveyList = document.getElementById('surveyList');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/survey-results');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch survey results');
+                }
+                
+                const surveyResults = await response.json();
+                
+                if (Object.keys(surveyResults).length === 0) {
+                    surveyList.innerHTML = `
+                        <div class="no-surveys">
+                            <h3>No surveys found</h3>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const surveysHTML = Object.values(surveyResults).map(survey => {
+                    const totalResponses = survey.responses.length;
+                    const lastResponse = totalResponses > 0 
+                        ? new Date(survey.responses[0].timestamp).toLocaleString()
+                        : 'No responses yet';
+
+                    // Format the user ID to show "Anonymous" if it's 1
+                    const lastRespondent = totalResponses > 0 
+                        ? (survey.responses[0].userId === '1' ? 'Anonymous' : `User ID: ${survey.responses[0].userId}`)
+                        : 'N/A';
+
+                    // Calculate response statistics
+                    let questionStats = '';
+                    if (totalResponses > 0) {
+                        questionStats = survey.questions.map((question, index) => {
+                            const yesCount = survey.responses.filter(r => 
+                                r.answers[index].answer.toLowerCase() === 'yes'
+                            ).length;
+                            const yesPercent = ((yesCount / totalResponses) * 100).toFixed(1);
+                            const noPercent = (100 - parseFloat(yesPercent)).toFixed(1);
+
+                            return `
+                                <div class="stat-box">
+                                    <strong>Question ${index + 1}:</strong>
+                                    <p>${question}</p>
+                                    <p>Yes: ${yesPercent}% | No: ${noPercent}%</p>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+
+                    return `
+                        <div class="survey-card">
+                            <div class="survey-header" style="color: black;">
+                                <h3>${survey.name}</h3>
+                                <div class="buttons">
+                                    <button class="btn btn-secondary" 
+                                        onclick="window.location.href='results.html?id=${survey.id}'">
+                                        View Detailed Results
+                                    </button>
+                                </div>
+                            </div>
+                            <p>Total Responses: ${totalResponses}</p>
+                            <p class="last-response">Last Response: ${lastResponse}</p>
+                            ${totalResponses > 0 ? `
+                                <p class="last-response">Last Response by: ${lastRespondent}</p>
+                                <div class="survey-stats">
+                                    ${questionStats}
+                                </div>
+                            ` : '<p>No responses received yet.</p>'}
+                        </div>
+                    `;
+                }).join('');
+
+                surveyList.innerHTML = surveysHTML;
+            } catch (error) {
+                console.error('Error loading survey results:', error);
+                surveyList.innerHTML = `
+                    <div class="error-message">
+                        <h3>Error loading survey results</h3>
+                        <p>Please try again later</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load results when page loads
+        loadAllSurveyResults();
+
+        // Refresh results every 30 seconds
+        setInterval(loadAllSurveyResults, 30000);
+    </script>
+</body>
+</html> 

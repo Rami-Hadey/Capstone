@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SurveyNOW</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="logout.css">
+    <style>
+          @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+    </style>
+    <script>
+      window.onload = function() {
+        sessionStorage.clear();
+        
+        window.history.pushState(null, '', window.location.href);
+        window.onpopstate = function() {
+          window.history.pushState(null, '', window.location.href);
+        };
+        setTimeout(function() {
+          window.location.href = './login.html';
+        }, 3000);
+      };
+    </script>
+  </head>
+
+  <body>
+    <div class="main-2-whiteblock">
+      <div class="parent-container">
+        <img src="login page - files/LOGO.svg" alt="logo" class="svg-logo">
+      </div>
+    </div>
+    <div class="main-1-gradient">
+      <div class="centered-box">
+        <div class="submission-message">Thank you!</div>
+       <br><br>
+        <div class="logout-message">You have been securely logged out.</div>
+      </div>
+    </div>
+  </body>
+</html> 

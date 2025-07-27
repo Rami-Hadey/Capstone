@@ -1,0 +1,105 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: "Roboto Flex", sans-serif;
+    background: linear-gradient(180deg, #4FE6FA 0%, #412BA2 100%);
+    min-width: 768px;
+    overflow-x: auto;
+}
+
+.logo-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.logo {
+    width: 300px;
+    height: auto;
+}
+
+.content-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.welcome-text {
+    color: white;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.question-text {
+    color: white;
+    font-size: 2em;
+    margin-bottom: 40px;
+}
+
+.centered-box {
+    background: rgba(217, 217, 217, 0.32);
+    border-radius: 35px;
+    padding: 40px;
+    width: 55%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.action-button {
+    width: 80%;
+    max-width: 300px;
+    padding: 15px;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    background: white;
+    color: black;
+    transition: all 0.3s ease;
+}
+
+.action-button:hover {
+    background: #D4D2D2;
+    color: #747474;
+}
+
+.action-button:active {
+    background: #8D8D8D;
+    color: #353535;
+}
+
+.private-mode-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.private-mode-text {
+    color: white;
+    font-size: 1.2em;
+}
+
+/* Toggle Switch Styling */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+

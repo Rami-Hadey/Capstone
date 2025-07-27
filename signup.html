@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join SurveyNOW</title>
+    <link rel="stylesheet" href="signup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Baloo' rel='stylesheet'>
+</head>
+<body>
+    <div class="main-gradient">
+        <div class="centered-box">
+            <form id="signupForm" class="parent-container">
+                <div class="signup-text">Join <span class="logo"><img src="login page - files/LOGO.svg" alt="logo"></span> Today!</div>
+                <input type="text" class="FName" placeholder="First Name">
+                <input type="text" class="LName" placeholder="Last Name">
+                <input type="email" class="Email" placeholder="E-mail">
+                <input type="password" class="Password" placeholder="Password">
+                <input type="password" class="ConfirmPassword" placeholder="Confirm Password">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="adminCheck" class="admin-checkbox">
+                    <label for="adminCheck">Check for admin account</label>
+                </div>
+                <button type="submit" class="signupbutton">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Update the event listener to use the form
+        document.getElementById('signupForm').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            // Retrieve input values from the form
+            const fName = document.querySelector('.FName').value.trim();
+            const lName = document.querySelector('.LName').value.trim();
+            const email = document.querySelector('.Email').value.trim();
+            const password = document.querySelector('.Password').value.trim();
+            const confirmPassword = document.querySelector('.ConfirmPassword').value.trim();
+            const isAdmin = document.querySelector('#adminCheck').checked;
+
+            // Validate form inputs
+            if (!fName || !lName || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            try {
+                // Update the fetch URL to match the server endpoint
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fname: fName,
+                        lname: lName,
+                        email: email,
+                        password: password,
+                        isadmin: isAdmin
+                    }),
+                });
+
+                // Handle the server's response
+                if (response.ok) {
+                    const message = await response.text();
+                    alert(message);
+                    window.location.href = './login.html';
+                } else if (response.status === 409) {
+                    alert('This email is already registered.');
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Error: ${errorMessage}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while creating your account.');
+            }
+        });
+    </script>
+</body>
+</html> 

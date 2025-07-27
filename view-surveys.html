@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Surveys</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #4FE6FA 0%, #412BA2 100%);
+            font-family: 'Fugaz One';
+            color: white;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .survey-list {
+            background: #d9d9d951;
+            border-radius: 35px;
+            padding: 20px;
+        }
+
+        .survey-item {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .survey-name {
+            font-size: 1.2em;
+            flex-grow: 1;
+        }
+
+        .points {
+            margin: 0 20px;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            margin-left: 10px;
+            font-family: 'Fugaz One';
+        }
+
+        button:hover {
+            background: #D4D2D2;
+        }
+
+        .edit-container {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .edit-form input[type="text"],
+        .edit-form input[type="number"],
+        .edit-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Roboto Flex', sans-serif;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Available Surveys</h1>
+        <div class="survey-list" id="surveyList">
+            <!-- Surveys will be loaded here -->
+        </div>
+        <div class="buttons" style="margin-top: 20px; text-align: center;">
+            <button onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadSurveys() {
+            try {
+                const response = await fetch('http://localhost:3000/api/surveys');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const surveys = await response.json();
+                
+                const surveyList = document.getElementById('surveyList');
+                surveyList.innerHTML = '';
+
+                if (!surveys || surveys.length === 0) {
+                    surveyList.innerHTML = '<p style="text-align: center">No surveys available.</p>';
+                    return;
+                }
+
+                surveys.forEach(survey => {
+                    // Create main survey item
+                    const surveyDiv = document.createElement('div');
+                    surveyDiv.innerHTML = `
+                        <div class="survey-item">
+                            <span class="survey-name">${survey.survey_name}</span>
+                            <span class="points">${survey.participation_points} points</span>
+                            <button onclick="toggleEdit('${survey.survey_id}')">Edit</button>
+                        </div>
+                        <div id="edit-${survey.survey_id}" class="edit-container">
+                            <div class="edit-form">
+                                <input type="text" id="name-${survey.survey_id}" value="${survey.survey_name}" placeholder="Survey Name">
+                                <input type="number" id="points-${survey.survey_id}" value="${survey.participation_points}" placeholder="Points">
+                                <textarea id="q1-${survey.survey_id}" placeholder="Question 1">${survey.question_1 || ''}</textarea>
+                                <textarea id="q2-${survey.survey_id}" placeholder="Question 2">${survey.question_2 || ''}</textarea>
+                                <textarea id="q3-${survey.survey_id}" placeholder="Question 3">${survey.question_3 || ''}</textarea>
+                                <div class="button-group">
+                                    <button onclick="saveSurvey('${survey.survey_id}')">Save Changes</button>
+                                    <button class="delete-btn" onclick="deleteSurvey('${survey.survey_id}')">Delete Survey</button>
+                                    <button onclick="toggleEdit('${survey.survey_id}')">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    surveyList.appendChild(surveyDiv);
+                });
+            } catch (error) {
+                console.error('Error loading surveys:', error);
+                document.getElementById('surveyList').innerHTML = 
+                    `<p style="text-align: center; color: red;">Error loading surveys: ${error.message}</p>`;
+            }
+        }
+
+        function toggleEdit(surveyId) {
+            console.log('Toggling edit for survey:', surveyId);
+            const editContainer = document.getElementById(`edit-${surveyId}`);
+            editContainer.style.display = editContainer.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function saveSurvey(surveyId) {
+            try {
+                console.log('Saving survey:', surveyId);
+                const updatedSurvey = {
+                    survey_name: document.getElementById(`name-${surveyId}`).value,
+                    participation_points: document.getElementById(`points-${surveyId}`).value,
+                    question_1: document.getElementById(`q1-${surveyId}`).value,
+                    question_2: document.getElementById(`q2-${surveyId}`).value,
+                    question_3: document.getElementById(`q3-${surveyId}`).value
+                };
+
+                const response = await fetch(`http://localhost:3000/api/surveys/${surveyId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedSurvey)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to update survey');
+                }
+                
+                alert('Survey updated successfully!');
+                loadSurveys(); // Reload the list
+            } catch (error) {
+                console.error('Error updating survey:', error);
+                alert(`Failed to update survey: ${error.message}`);
+            }
+        }
+
+        async function deleteSurvey(surveyId) {
+            if (!surveyId) {
+                console.error('Survey ID is undefined');
+                return;
+            }
+
+            if (confirm('Are you sure you want to delete this survey?')) {
+                try {
+                    console.log('Deleting survey:', surveyId);
+                    const response = await fetch(`http://localhost:3000/api/surveys/${surveyId}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to delete survey');
+                    }
+                    
+                    alert('Survey deleted successfully!');
+                    loadSurveys(); // Reload the list
+                } catch (error) {
+                    console.error('Error deleting survey:', error);
+                    alert(`Failed to delete survey: ${error.message}`);
+                }
+            }
+        }
+
+        // Load surveys when page loads
+        document.addEventListener('DOMContentLoaded', loadSurveys);
+    </script>
+</body>
+</html> 

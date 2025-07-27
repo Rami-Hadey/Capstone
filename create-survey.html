@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Survey</title>
+    <link href="progress.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #4FE6FA 0%, #412BA2 100%);
+            font-family: 'Fugaz One';
+            display: flex;           
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        .survey-creator {
+            width: 90%;             
+            max-width: 800px;
+            margin: 0 auto;        
+            padding: 40px;
+            background: #d9d9d951;
+            border-radius: 35px;
+            color: white;
+            position: absolute;         
+            top: 50%;                  
+            left: 50%;                 
+            transform: translate(-50%, -50%); 
+        }
+
+        h2 {
+            text-align: center;
+            font-family: 'Fugaz One', cursive;
+            font-size: 33px;
+            margin-bottom: 30px;
+        }
+
+        .setup-container, .questions-container {
+            margin: 20px 0;
+        }
+
+        .question-input {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            align-items: center;
+        }
+
+        .question-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .question-number {
+            min-width: 30px;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+            margin: 5px 0;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-family: 'Fugaz One';
+            font-size: 15px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: none;
+            border-bottom: 2px rgba(255, 255, 255, 0.89) solid;
+            background: transparent;
+            color: white;
+            font-family: 'Roboto Flex', sans-serif;
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .question-input input {
+            border: none;
+            border-bottom: 2px rgba(255, 255, 255, 0.89) solid;
+            background: transparent;
+            color: white;
+            font-family: 'Roboto Flex', sans-serif;
+        }
+
+        .question-input input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .savebutton, .resetbutton {
+            display: flex;
+            width: 180px;
+            height: 40px;
+            padding: 10px;
+            justify-content: center;
+            align-items: center;
+            border-radius: 30px;
+            background: #FFF;
+            color: black;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+        }
+
+        .savebutton:hover, .resetbutton:hover {
+            background: #D4D2D2;
+        }
+
+        .savebutton:active, .resetbutton:active {
+            background: #8D8D8D;
+        }
+
+        .savebutton.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            background: #D4D2D2;
+        }
+
+        .Save, .Reset {
+            font-family: 'Fugaz One';
+            font-size: 20px;
+            color: black;
+            text-align: center;
+        }
+
+        button {
+            display: none;
+        }
+
+        .points-input {
+            width: 100px !important;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .generateButton {
+            padding: 8px 15px;
+            background: #FFF;
+            border-radius: 15px;
+            color: black;
+            cursor: pointer;
+            font-family: 'Fugaz One';
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .generateButton:hover {
+            background: #D4D2D2;
+        }
+
+        .generateButton:active {
+            background: #8D8D8D;
+        }
+
+        .points-input {
+            width: 150px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-creator">
+        <h2>Create Survey</h2>
+        
+        <div class="setup-container">
+            <div class="input-group">
+                <label for="surveyName">Survey Name:</label>
+                <input type="text" id="surveyName" placeholder="Enter survey name" onchange="validateForm()" required>
+            </div>
+            <div class="input-group">
+                <label for="participationPoints">Participation Points:</label>
+                <input type="number" 
+                       id="participationPoints" 
+                       class="points-input" 
+                       placeholder="Points" 
+                       min="1" 
+                       step="1" 
+                       onchange="validateForm()"
+                       oninput="validatePoints(this)" 
+                       required>
+                <div id="pointsError" class="error-message">Please enter a valid integer greater than 0</div>
+            </div>
+            <div class="input-group">
+                <label for="passcode">Survey Passcode:</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" 
+                           id="passcode" 
+                           class="points-input" 
+                           placeholder="Enter or generate passcode" 
+                           maxlength="6"
+                           pattern="[0-9]{6}"
+                           oninput="validatePasscode(this)"
+                           onchange="validateForm()"
+                           required>
+                    <div class="generateButton" onclick="generateUniquePasscode()">Generate</div>
+                </div>
+                <div id="passcodeError" class="error-message">Passcode must be exactly 6 digits</div>
+            </div>
+        </div>
+
+        <div class="questions-container">
+            <div id="questionFields">
+                <div class="question-input">
+                    <span class="question-number">Q1:</span>
+                    <input type="text" id="question0" placeholder="Enter question 1" maxlength="1000" onchange="validateForm()">
+                </div>
+                <div class="question-input">
+                    <span class="question-number">Q2:</span>
+                    <input type="text" id="question1" placeholder="Enter question 2" maxlength="1000" onchange="validateForm()">
+                </div>
+                <div class="question-input">
+                    <span class="question-number">Q3:</span>
+                    <input type="text" id="question2" placeholder="Enter question 3" maxlength="1000" onchange="validateForm()">
+                </div>
+            </div>
+            <div class="buttons">
+                <div data-layer="save-button" class="savebutton">
+                    <div data-layer="Save" class="Save">Save Survey</div>
+                </div>
+                
+                <div data-layer="reset-button" class="resetbutton">
+                    <div data-layer="Reset" class="Reset">Start Over</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validatePoints(input) {
+            const value = input.value;
+            const errorDiv = document.getElementById('pointsError');
+            
+            if (!Number.isInteger(Number(value)) || Number(value) <= 0) {
+                errorDiv.style.display = 'block';
+                input.setCustomValidity('Please enter a valid integer greater than 0');
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                input.setCustomValidity('');
+                return true;
+            }
+        }
+
+        function validatePasscode(input) {
+            const value = input.value;
+            const errorDiv = document.getElementById('passcodeError');
+            const isValid = /^\d{6}$/.test(value);
+            
+            if (!isValid && value !== '') {
+                errorDiv.style.display = 'block';
+                input.setCustomValidity('Passcode must be exactly 6 digits');
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                input.setCustomValidity('');
+                return true;
+            }
+        }
+
+        function validateForm() {
+            const surveyName = document.getElementById('surveyName').value.trim();
+            const points = document.getElementById('participationPoints').value.trim();
+            const passcode = document.getElementById('passcode').value.trim();
+            const saveBtn = document.querySelector('.savebutton');
+            
+            let allFilled = surveyName !== '' && 
+                           points !== '' && 
+                           passcode !== '';
+
+            if (points !== '') {
+                allFilled = allFilled && validatePoints(document.getElementById('participationPoints'));
+            }
+
+            if (passcode !== '') {
+                allFilled = allFilled && validatePasscode(document.getElementById('passcode'));
+            }
+
+            for (let i = 0; i < 3; i++) {
+                const question = document.getElementById(`question${i}`).value.trim();
+                if (!question) {
+                    allFilled = false;
+                    break;
+                }
+            }
+
+            if (allFilled) {
+                saveBtn.classList.remove('disabled');
+            } else {
+                saveBtn.classList.add('disabled');
+            }
+        }
+
+        document.querySelector('.savebutton').addEventListener('click', async (event) => {
+            event.preventDefault();
+            console.log('Save button clicked');
+
+            const payload = {
+                surveyName: document.getElementById('surveyName').value.trim(),
+                participationPoints: parseInt(document.getElementById('participationPoints').value),
+                passcode: document.getElementById('passcode').value.trim(),
+                question0: document.getElementById('question0').value.trim(),
+                question1: document.getElementById('question1').value.trim(),
+                question2: document.getElementById('question2').value.trim()
+            };
+            console.log('Attempting to send payload:', payload);
+
+            try {
+                const response = await fetch('http://localhost:3000/createsurvey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                    credentials: 'include'
+                });
+
+                console.log('Response:', response);
+                console.log('Response status:', response.status);
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (response.ok) {
+                    alert(data.message);
+                    window.location.href = 'adminlanding.html';
+                } else {
+                    console.error('Server error:', data);
+                    alert(`Error: ${data.message || 'Unknown error occurred'}`);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('An error occurred while creating the survey. Please try again.');
+            }
+        });
+
+        document.querySelector('.resetbutton').addEventListener('click', () => {
+            resetForm();
+        });
+
+        function resetForm() {
+            document.getElementById('surveyName').value = '';
+            document.getElementById('participationPoints').value = '';
+            document.getElementById('pointsError').style.display = 'none';
+            document.getElementById('passcode').value = '';
+            document.getElementById('passcodeError').style.display = 'none';
+            for (let i = 0; i < 3; i++) {
+                document.getElementById(`question${i}`).value = '';
+            }
+            validateForm();
+        }
+
+        async function generateUniquePasscode() {
+            try {
+                // Generate initial passcode
+                let passcode = Math.floor(100000 + Math.random() * 900000).toString();
+                console.log('Attempting to check passcode:', passcode);
+                
+                // Check if passcode exists in database
+                const checkUrl = `http://localhost:3000/checkpasscode/${passcode}`;
+                console.log('Making request to:', checkUrl);
+                
+                const response = await fetch(checkUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Server response:', data);
+                
+                // If passcode exists, keep generating new ones until we find a unique one
+                while (data.exists) {
+                    passcode = Math.floor(100000 + Math.random() * 900000).toString();
+                    console.log('Trying new passcode:', passcode);
+                    
+                    const retryResponse = await fetch(`http://localhost:3000/checkpasscode/${passcode}`);
+                    
+                    if (!retryResponse.ok) {
+                        throw new Error(`HTTP error! status: ${retryResponse.status}`);
+                    }
+                    
+                    const retryData = await retryResponse.json();
+                    if (!retryData.exists) break;
+                }
+                
+                document.getElementById('passcode').value = passcode;
+                validateForm();
+            } catch (error) {
+                console.error('Error generating unique passcode:', error);
+                alert('Error generating passcode. Please try again.');
+            }
+        }
+
+        // Generate passcode when page loads
+        document.addEventListener('DOMContentLoaded', generateUniquePasscode);
+    </script>
+</body>
+</html> 

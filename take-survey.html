@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Survey</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+
+        body {
+            background: hsl(251, 58%, 40%);
+            color: white;
+            font-family: 'Roboto Flex', sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-container {
+            width: 50%;
+            height: auto;
+            margin: 20px auto;
+            padding: 25px;
+            background: rgba(217, 217, 217, 0.32);
+            border-radius: 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 101;
+        }
+
+        .logo {
+            height: 50px;
+            width: auto;
+        }
+
+        h1 {
+            font-family: 'Fugaz One', cursive;
+            text-align: center;
+            color: white;
+            margin: 25px 0;
+            font-size: 1.8em;
+        }
+
+        .question {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .question:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .question p {
+            font-family: 'Roboto Flex', sans-serif;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: white;
+            text-align: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .answer-button, button[type="submit"] {
+            padding: 10px 35px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-family: 'Fugaz One', cursive;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            color: black;
+        }
+
+        .answer-button:hover, button[type="submit"]:hover {
+            background: #D4D2D2;
+            color: #747474;
+            transform: translateY(-2px);
+        }
+
+        .answer-button:active, button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        .answer-button.selected {
+            background: #2196F3;
+            color: white;
+        }
+
+        textarea {
+            width: 100%;
+            height: auto;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1em;
+            font-family: 'Roboto Flex', sans-serif;
+            background: white;
+            color: #333;
+            resize: vertical;
+            outline: none;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        textarea:focus {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .private-mode-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            gap: 12px;
+        }
+
+        .private-mode-text {
+            font-family: 'Fugaz One', cursive;
+            color: white;
+            font-size: 1em;
+        }
+
+        /* Switch styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        button[type="submit"] {
+            display: block;
+            width: auto;
+            min-width: 180px;
+            margin: 25px auto;
+        }
+
+        /* Error state styling */
+        .error {
+            border: 2px solid #ff4444;
+        }
+
+        /* Success message styling */
+        .success-message {
+            background: rgba(76, 175, 80, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #surveyForm {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-container">
+        <div class="logo-container">
+            <img src="login page - files/LOGO.svg" alt="Logo" class="logo">
+        </div>
+        
+        <h1 id="surveyName"></h1>
+        <form id="surveyForm">
+            <div class="question">
+                <p id="question1"></p>
+                <div class="button-group">
+                    <button type="button" class="answer-button" onclick="selectAnswer(1, 'Yes')">Yes</button>
+                    <button type="button" class="answer-button" onclick="selectAnswer(1, 'No')">No</button>
+                </div>
+                <input type="hidden" name="answer1" id="answer1" required>
+            </div>
+
+            <div class="question">
+                <p id="question2"></p>
+                <div class="button-group">
+                    <button type="button" class="answer-button" onclick="selectAnswer(2, 'Yes')">Yes</button>
+                    <button type="button" class="answer-button" onclick="selectAnswer(2, 'No')">No</button>
+                </div>
+                <input type="hidden" name="answer2" id="answer2" required>
+            </div>
+
+            <div class="question">
+                <p id="question3"></p>
+                <textarea name="answer3" maxlength="1000" required placeholder="Type your response here..."></textarea>
+            </div>
+
+            <div class="private-mode-container">
+                <span class="private-mode-text">Private Mode</span>
+                <label class="switch">
+                    <input type="checkbox" id="privateMode">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <button type="submit">Submit Survey</button>
+        </form>
+    </div>
+
+    <script>
+        let surveyData = null;
+
+        async function loadSurvey() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const surveyId = urlParams.get('id');
+            
+            if (!surveyId) {
+                alert('Invalid survey ID');
+                window.location.href = 'survey-list.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/surveys/${surveyId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch survey');
+                }
+                
+                surveyData = await response.json();
+                
+                if (!surveyData) {
+                    throw new Error('No survey data received');
+                }
+
+                document.getElementById('surveyName').textContent = surveyData.survey_name;
+                document.getElementById('question1').textContent = surveyData.question_1;
+                document.getElementById('question2').textContent = surveyData.question_2;
+                document.getElementById('question3').textContent = surveyData.question_3;
+            } catch (error) {
+                console.error('Error loading survey:', error);
+                alert('Error loading survey: ' + error.message);
+                window.location.href = 'survey-list.html';
+            }
+        }
+
+        function selectAnswer(questionNum, answer) {
+            const buttons = document.querySelectorAll(`.question:nth-child(${questionNum}) .answer-button`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            const selectedButton = Array.from(buttons).find(btn => btn.textContent === answer);
+            selectedButton.classList.add('selected');
+            
+            document.getElementById(`answer${questionNum}`).value = answer;
+        }
+
+        document.getElementById('surveyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const userId = localStorage.getItem('userId');
+            const isPrivateMode = document.getElementById('privateMode').checked;
+            
+            if (!userId && !isPrivateMode) {
+                alert('Please log in to submit a survey');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Use user ID 1 for private mode submissions
+            const submissionUserId = isPrivateMode ? '1' : userId;
+
+            const surveyResponse = {
+                userId: submissionUserId,
+                surveyId: surveyData.survey_id,
+                answers: {
+                    answer1: formData.get('answer1'),
+                    answer2: formData.get('answer2'),
+                    answer3: formData.get('answer3')
+                },
+                privateMode: isPrivateMode
+            };
+
+            console.log('Submitting survey data:', JSON.stringify(surveyResponse, null, 2));
+
+            try {
+                const response = await fetch('http://localhost:3000/submit-survey', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(surveyResponse)
+                });
+
+                const responseData = await response.json();
+                console.log('Server response:', responseData);
+
+                if (!response.ok) {
+                    throw new Error(responseData.error || 'Failed to submit survey');
+                }
+
+                alert('Survey submitted successfully!');
+                window.location.href = 'userlanding.html';
+            } catch (error) {
+                console.error('Error submitting survey:', error);
+                alert('Error submitting survey: ' + error.message);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadSurvey);
+    </script>
+</body>
+</html>

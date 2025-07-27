@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SurveyNOW</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="login.css">
+    <style>
+          @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+    </style>
+  </head>
+
+  <body>
+    <div class="main-2-whiteblock">
+      <div class="parent-container">
+        <div class="star star1">
+          <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0L18.3677 10.3647H29.2658L20.4491 16.7705L23.8168 27.1353L15 20.7295L6.18322 27.1353L9.55093 16.7705L0.734152 10.3647H11.6323L15 0Z"/>
+          </svg>
+        </div>
+        <div class="star star2">
+          <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0L18.3677 10.3647H29.2658L20.4491 16.7705L23.8168 27.1353L15 20.7295L6.18322 27.1353L9.55093 16.7705L0.734152 10.3647H11.6323L15 0Z"/>
+          </svg>
+        </div>
+        <div class="star star3">
+          <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0L18.3677 10.3647H29.2658L20.4491 16.7705L23.8168 27.1353L15 20.7295L6.18322 27.1353L9.55093 16.7705L0.734152 10.3647H11.6323L15 0Z"/>
+          </svg>
+        </div>
+        <div class="star star4">
+          <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0L18.3677 10.3647H29.2658L20.4491 16.7705L23.8168 27.1353L15 20.7295L6.18322 27.1353L9.55093 16.7705L0.734152 10.3647H11.6323L15 0Z"/>
+          </svg>
+        </div>
+        <div class="star star5">
+          <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 0L18.3677 10.3647H29.2658L20.4491 16.7705L23.8168 27.1353L15 20.7295L6.18322 27.1353L9.55093 16.7705L0.734152 10.3647H11.6323L15 0Z"/>
+          </svg>
+        </div>
+          <img src="login page - files/PICTURE.svg" alt="picture" class="svg-picture">
+          <img src="login page - files/LOGO.svg" alt="logo" class="svg-logo">
+      </div>
+  </div>
+    <div class="main-1-gradient">
+      <div class="centered-box">
+        <img src="login page - files/account_circle.svg" alt="account_circle" class="svg-account-icon">
+        <div class="userlogintext" style="text-align: center; font-size: 33px; font-family: Fugaz One; 
+        font-style: normal; font-weight: 400; color: white;">User Login</div>
+        <form id="loginForm" style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+            <div class="input-container" style="margin-bottom: 10px;">
+              <input 
+                type="email" 
+                placeholder="Email" 
+                class="Email" 
+                style="width: 282px; height: 40px; border: none; border-bottom: 2px rgba(255, 255, 255, 0.89) solid; background: transparent; box-shadow: none; font-size: 14px; color: white; outline: none;" 
+              />
+            </div>
+            <div class="input-container" style="margin-bottom: 10px;">
+              <input 
+                type="password" 
+                placeholder="Password" 
+                class="Password" 
+                style="width: 282px; height: 40px; border: none; border-bottom: 2px rgba(255, 255, 255, 0.89) solid; background: transparent; box-shadow: none; font-size: 14px; color: white; padding: 5px 0; outline: none;" 
+              />
+            </div>
+            <div data-layer="login-button" class="loginbutton">
+              <div data-layer="Login" class="Login" style="text-align: center; font-size: 33px; font-family: Fugaz One; 
+              font-style: normal; font-weight: 400; word-wrap: break-word">Login</div>
+            </div>
+        </form>
+        
+        <div class="signup-link">
+          <a href="./signup.html" style="text-decoration: none; color: white; font-family: 'Roboto Flex', serif; font-size: 14px;">
+            Click here to create account
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        document.querySelector('.loginbutton').addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            const email = document.querySelector('.Email').value.trim();
+            const password = document.querySelector('.Password').value.trim();
+
+            // Validate inputs
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // Store user's first name for the landing page
+                        localStorage.setItem('userName', data.fname);
+                        localStorage.setItem('userId', data.userId);
+                        
+                        // Redirect based on admin status
+                        if (data.isAdmin) {
+                            window.location.href = './adminlanding.html';
+                        } else {
+                            window.location.href = './userlanding.html';
+                        }
+                    }
+                } else {
+                    const errorMessage = await response.text();
+                    console.error('Error response:', errorMessage);
+                    alert(errorMessage);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                alert('An error occurred during login. Check console for details.');
+            }
+        });
+    </script>
+  </body>
+</html>

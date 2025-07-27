@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey NOW - Welcome</title>
+    <link rel="stylesheet" href="userlanding.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="login page - files/LOGO.svg" alt="Logo" class="logo">
+    </div>
+
+    <div class="content-container">
+        <h1 class="welcome-text">Hello, <span class="username">&lt;UserName&gt;</span>!</h1>
+        
+        <h2 class="question-text">What would you like to do today?</h2>
+        
+        <div class="centered-box">
+            <button class="action-button survey-button" onclick="window.location.href='survey-list-user.html'">Take a Survey</button>
+            <a href="logout.html" class="action-button logout-button">Log Out</a>
+            
+        </div>
+    </div>
+
+    <script>
+        // Get and display the user's name
+        document.addEventListener('DOMContentLoaded', () => {
+            const userName = localStorage.getItem('userName') || 'User';
+            document.querySelector('.username').textContent = userName;
+        });
+    </script>
+</body>
+</html> 

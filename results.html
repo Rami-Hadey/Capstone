@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Results</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+        
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(180deg, #4FE6FA 0%, #412BA2 100%);
+            padding: 20px;
+        }
+        
+        .results-container {
+            max-width: 800px;
+            width: 90%;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(217, 217, 217, 0.32);
+            border-radius: 35px;
+            font-family: 'Fugaz One';
+        }
+        
+        .result-summary {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .question-stat {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .response-list {
+            margin-top: 30px;
+        }
+        
+        .response-item {
+            margin: 15px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            background: white;
+        }
+
+        h2, h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Fugaz One';
+        }
+
+        .btn-primary {
+            background: white;
+            color: black;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            background: #D4D2D2;
+        }
+
+        .error-message {
+            color: #ff4444;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="results-container">
+        <h2 id="surveyName">Survey Results</h2>
+        
+        <div class="result-summary" id="summary">
+            <h3 style="color: black;">Summary</h3>
+            <!-- Summary stats will be inserted here -->
+        </div>
+        
+        <div class="response-list" id="responses">
+            <h3>Individual Responses</h3>
+            <!-- Individual responses will be inserted here -->
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="window.location.href='survey-list-results.html'">Back to Results</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadSurveyResults() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const surveyId = urlParams.get('id');
+            
+            if (!surveyId) {
+                window.location.href = 'survey-list-results.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/survey-results');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch survey results');
+                }
+                
+                const allResults = await response.json();
+                const survey = allResults[surveyId];
+                
+                if (!survey) {
+                    throw new Error('Survey not found');
+                }
+
+                // Display survey name
+                document.getElementById('surveyName').textContent = `Results: ${survey.name}`;
+                
+                // Calculate and display summary
+                const summary = document.getElementById('summary');
+                const totalResponses = survey.responses.length;
+                
+                let summaryHTML = `<p>Total Responses: ${totalResponses}</p>`;
+                
+                if (totalResponses > 0) {
+                    summaryHTML += survey.questions.map((question, index) => {
+                        const yesCount = survey.responses.filter(r => 
+                            r.answers[index].answer.toLowerCase() === 'yes'
+                        ).length;
+                        const noCount = totalResponses - yesCount;
+                        const yesPercent = ((yesCount / totalResponses) * 100).toFixed(1);
+                        const noPercent = ((noCount / totalResponses) * 100).toFixed(1);
+                        
+                        return `
+                            <div class="question-stat">
+                                <p><strong>Q: ${question}</strong></p>
+                                <p>Yes: ${yesCount} (${yesPercent}%)</p>
+                                <p>No: ${noCount} (${noPercent}%)</p>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                summary.innerHTML = summaryHTML;
+                
+                // Display individual responses
+                const responsesDiv = document.getElementById('responses');
+                responsesDiv.innerHTML = survey.responses.map((response, index) => `
+                    <div class="response-item">
+                        <h4>Response #${index + 1}</h4>
+                        <p>Submitted by ${response.userId === 1 ? 'Anonymous' : `User ID: ${response.userId}`}</p>
+                        <p>Submitted: ${new Date(response.timestamp).toLocaleString()}</p>
+                        ${response.answers.map((answer, i) => `
+                            <p><strong>Q: ${survey.questions[i]}</strong><br>
+                            A: ${answer.answer}</p>
+                        `).join('')}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading survey results:', error);
+                document.querySelector('.results-container').innerHTML = `
+                    <div class="error-message">
+                        <h3>Error loading survey results</h3>
+                        <p>${error.message}</p>
+                        <div class="buttons">
+                            <button class="btn btn-primary" onclick="window.location.href='survey-list-results.html'">
+                                Back to Results
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load results when page loads
+        loadSurveyResults();
+
+        // Refresh results every 30 seconds
+        setInterval(loadSurveyResults, 30000);
+    </script>
+</body>
+</html> 

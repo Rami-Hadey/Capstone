@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Surveys</title>
+    <link rel="stylesheet" href="userlanding.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fugaz+One&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+        
+        .survey-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 5px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;  /* Use viewport height */
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: rgba(217, 217, 217, 0.9);
+            padding: 30px;
+            width: 400px;
+            border-radius: 15px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);  /* Center using transform */
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);  /* Added subtle shadow */
+        }
+
+        .modal-content h2 {
+            color: #412BA2;
+            font-family: 'Fugaz One';
+            margin-bottom: 20px;
+        }
+
+        #passcodeInput {
+            width: 80%;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-family: 'Roboto Flex';
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Fugaz One';
+            transition: all 0.3s ease;
+        }
+
+        .submit-button {
+            background: white;
+            color: black;
+        }
+
+        .close-button {
+            background: #ff4444;
+            color: white;
+        }
+
+        .modal-button:hover {
+            background: #D4D2D2;
+            color: #747474;
+        }
+
+        .close-button:hover {
+            background: #ff6666;
+        }
+
+        .question {
+        margin-bottom: 20px;
+        }
+
+        textarea {
+        width: 100%;
+        min-height: 100px;
+        }
+
+        .survey-card {
+            background: rgba(217, 217, 217, 0.32);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 8px 0;
+            color: white;
+            width: 80%;
+            max-width: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .survey-info {
+            font-family: 'Fugaz One';
+        }
+
+        .survey-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .survey-card h3 {
+            margin: 0;
+            font-family: 'Fugaz One';
+            font-size: 1.1em;
+        }
+
+        .survey-card p {
+            margin: 0;
+            font-family: 'Roboto Flex';
+            font-size: 1em;
+        }
+
+        .survey-card button {
+            width: 130px;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            background: white;
+            color: black;
+            transition: all 0.3s ease;
+            font-family: 'Fugaz One';
+            margin-left: 15px;
+        }
+
+        .survey-card button:hover {
+            background: #D4D2D2;
+            color: #747474;
+        }
+
+        .survey-card button:active {
+            background: #8D8D8D;
+            color: #353535;
+        }
+
+        #surveys-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .search-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-family: 'Roboto Flex';
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            background: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .search-bar::placeholder {
+            color: #666;
+        }
+
+        .header-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #412BA2;
+            z-index: 100;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-fixed h1 {
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 10px 0;
+        }
+
+        .search-container {
+            width: 80%;
+            max-width: 800px;
+            margin: 10px auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        #surveys-list {
+            margin-top: 200px; /* Adjust this value based on your header height */
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 10px; /* Adjust this value for vertical positioning */
+            left: 20px; /* Adjust this value for distance from left edge */
+            z-index: 101;
+        }
+
+        .logo {
+            height: 50px; /* Adjust size as needed */
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo -->
+    <div class="logo-container">
+        <img src="login page - files/LOGO.svg" alt="Logo" class="logo">
+    </div>
+
+    <div class="header-fixed">
+        <h1>Available Surveys</h1>
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Search surveys..." id="searchInput" oninput="filterSurveys()">
+        </div>
+    </div>
+
+    <div id="surveys-list">
+        <!-- Survey cards will be dynamically added here -->
+    </div>
+
+    <!-- Passcode -->
+    <div id="passcodeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Enter Survey Passcode</h2>
+            <input type="text" id="passcodeInput" maxlength="6" placeholder="Enter 6-digit code">
+            <div class="modal-buttons">
+                <button class="modal-button submit-button" onclick="verifyPasscode()">Submit</button>
+                <button class="modal-button close-button" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+
+        let selectedSurvey = null;
+        let allSurveys = []; // Store all surveys
+
+        async function loadSurveys() {
+            try {
+                const response = await fetch('http://localhost:3000/api/surveys');
+                allSurveys = await response.json(); // Store surveys globally
+                displaySurveys(allSurveys); // Display all surveys initially
+            } catch (error) {
+                console.error('Error loading surveys:', error);
+                document.getElementById('surveys-list').innerHTML = 
+                    '<p>Error loading surveys. Please try again later.</p>';
+            }
+        }
+
+        function displaySurveys(surveys) {
+            const listDiv = document.getElementById('surveys-list');
+            listDiv.innerHTML = ''; // Clear existing content
+
+            surveys.forEach(survey => {
+                const surveyDiv = document.createElement('div');
+                surveyDiv.className = 'survey-card';
+                surveyDiv.innerHTML = `
+                    <div class="survey-info">
+                        <h3>${survey.survey_name}</h3>
+                    </div>
+                    <div class="survey-actions">
+                        <p>Points: ${survey.participation_points}</p>
+                        <button onclick="startSurvey(${survey.survey_id})">Take Survey</button>
+                    </div>
+                `;
+                listDiv.appendChild(surveyDiv);
+            });
+        }
+
+        function filterSurveys() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredSurveys = allSurveys.filter(survey => 
+                survey.survey_name.toLowerCase().includes(searchTerm)
+            );
+            displaySurveys(filteredSurveys);
+        }
+
+        function startSurvey(surveyId) {
+            selectedSurvey = surveyId;
+            document.getElementById('passcodeModal').style.display = 'block';
+        }
+
+        async function verifyPasscode() {
+            const passcode = document.getElementById('passcodeInput').value;
+            try {
+                const response = await fetch('http://localhost:3000/api/checkpasscode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        passcode: passcode,
+                        surveyId: selectedSurvey
+                    })
+                });
+                const data = await response.json();
+
+                if (data.valid) {
+                    window.location.href = `take-survey.html?id=${selectedSurvey}`;
+                } else {
+                    alert('Invalid passcode for this survey. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error verifying passcode:', error);
+                alert('An error occurred while verifying the passcode. Please try again later.');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('passcodeModal').style.display = 'none';
+            document.getElementById('passcodeInput').value = ''; // Clear input
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('passcodeModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadSurveys);
+    </script>
+
+</body>
+</html>
